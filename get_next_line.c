@@ -6,7 +6,7 @@
 /*   By: ancourt <ancourt@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/16 11:45:48 by ancourt           #+#    #+#             */
-/*   Updated: 2025/12/29 11:07:33 by ancourt          ###   ########.fr       */
+/*   Updated: 2026/01/08 15:57:10 by ancourt          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,9 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#define BUFFER_SIZE 100
+#ifndef BUFFER_SIZE
+# define BUFFER_SIZE 100
+#endif
 
 char	*ft_newline(char *s)
 {
