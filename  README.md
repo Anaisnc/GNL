@@ -1,93 +1,138 @@
-*This project has been created as part of the 42 curriculum by ancourt.*
+*This project has been created as part of the 42 curriculum by <your_login>.*
 
-# ft_printf
+# get_next_line
 
 ## Description
 
-This project goal was to reproduce the original printf function, handling only the following conversions cspdiuxX% :
+The **get_next_line** project consists in implementing a C function that reads a file descriptor **line by line**, returning one line at each call.
 
-• %c Prints a single character.
-• %s Prints a string (as defined by the common C convention).
-• %p The void * pointer argument has to be printed in hexadecimal format.
-• %d Prints a decimal (base 10) number.
-• %i Prints an integer in base 10.
-• %u Prints an unsigned decimal (base 10) number.
-• %x Prints a number in hexadecimal (base 16) lowercase format.
-• %X Prints a number in hexadecimal (base 16) uppercase format.
-• %% Prints a percent sign.
+The main challenge of this project is to correctly handle partial reads caused by the `read()` system call, while preserving unread data between function calls. The function must work with any buffer size, manage memory safely, and correctly handle end-of-file and error cases.
+
+This project introduces important concepts such as:
+- Static variables
+- Buffer management
+- File descriptor handling
+- Dynamic memory allocation
+- Robust algorithm design in C
+
+---
 
 ## Instructions
 
 ### Compilation
 
-The project is compiled using the Makefile:
+Compile the project with:
 
-make
-make clean
-make fclean
-make re
+```bash
+cc -Wall -Wextra -Werror get_next_line.c get_next_line_utils.c
 
-This produces the static library : libftprintf.a
+You can define a custom buffer size at compilation:
 
-### Usage
+cc -Wall -Wextra -Werror -D BUFFER_SIZE=42 get_next_line.c get_next_line_utils.c
 
-To us the library:
-```c
-#include <stdio.h>
-#include <limits.h>
-#include "ft_printf.h" 
+Usage
 
-int	main(void)
+Include the header in your program:
+
+#include "get_next_line.h"
+
+Example usage:
+
+int fd;
+char *line;
+
+fd = open("example.txt", O_RDONLY);
+while ((line = get_next_line(fd)))
 {
-	int	original;
-	int	crafted;
-
-	char	*str = "Hello world";
-	char	*empty_str = "";
-	char	*null_str = NULL;
-	void	*ptr = str;
-	void	*null_ptr = NULL;
-	int	n = 12;
-	int	neg = -12;
-	int	zero = 0;
-	unsigned int u = 12;
-	unsigned int u_large = 4294967295;
-
-	original = printf("%s %s %s\n", str, empty_str, null_str);
-	crafted = ft_printf("%s %s %s\n", str, empty_str, null_str);
-	printf("%d | %d\n\n", original, crafted);
-
-	original = printf("%d %d %d\n", n, neg, zero);
-    crafted = ft_printf("%d %d %d\n\n", n, neg, zero);
-    printf("%d | %d\n\n", original, crafted);
-
-	original = printf("%u %u\n", u, u_large);
-    crafted = ft_printf("%u %u\n\n", u, u_large);
-    printf("%d | %d\n\n", original, crafted);
-
-	original = printf("%x %X\n", u_large, u_large);
-    crafted = ft_printf("%x %X\n\n", u_large, u_large);
-    printf("%d | %d\n\n", original, crafted);
-
-	original = printf("%p %p\n", ptr, null_ptr);
-    crafted = ft_printf("%p %p\n\n", ptr, null_ptr);
-    printf("%d | %d\n\n", original, crafted);
-
-	original = printf("%%\n");
-    crafted = ft_printf("%%\n\n");
-    printf("%d | %d\n\n", original, crafted);
-
-    return (0);
+    printf("%s", line);
+    free(line);
 }
-```
-## Resources
+close(fd);
 
-### References
+The function returns:
+	•	A line including \n if present
+	•	The last line without \n if EOF is reached
+	•	NULL when there is nothing left to read or on error
 
-- Documentation on printf and formatted output : [https://www.geeksforgeeks.org/c/printf-in-c/](https://www.geeksforgeeks.org/c/printf-in-c/)
-- Articles and tutorials on variadic functions in C
-Books:
-C Programming A modern Approach K.N.KING : to understand variable-length argument lists.
+⸻
 
-AI:
-To help me improve explanations and structure this README.
+Algorithm Explanation
+
+Core idea
+
+The read() function reads a fixed number of bytes and does not respect line boundaries.
+Therefore, the algorithm accumulates data until a complete line is found.
+
+To achieve this, a static buffer is used to store unread characters between function calls.
+
+⸻
+
+Main variables
+
+The algorithm uses four main variables:
+	•	buff
+A temporary buffer allocated with BUFFER_SIZE + 1 bytes, used to store the result of read().
+	•	static tmp
+A static string that keeps unread data between calls to get_next_line.
+	•	save_tmp
+A temporary pointer used during concatenation to safely manage memory.
+	•	line
+The string returned by the function, containing exactly one line.
+
+⸻
+
+Step-by-step behavior
+	1.	Validation
+	•	If fd < 0 or BUFFER_SIZE <= 0, the function returns NULL.
+	2.	Reading
+	•	Data is read into buff.
+	•	buff is concatenated to static tmp.
+	•	This continues until a newline \n is found or EOF is reached.
+	3.	Newline detection
+	•	If a newline is found in tmp, the line can be extracted.
+	4.	Line extraction
+	•	The function allocates memory for the line.
+	•	Copies characters from the beginning of tmp up to and including \n.
+	•	The remaining data after \n is saved back into tmp.
+	5.	End of file
+	•	If EOF is reached and tmp still contains data, it is returned as the final line.
+	•	If no data remains, the function returns NULL.
+
+⸻
+
+Memory management
+
+Special attention is given to memory safety:
+	•	Every malloc is paired with a free
+	•	Freed pointers are reset to NULL
+	•	The static buffer is freed at EOF
+	•	No memory leaks or invalid accesses occur
+
+This ensures robust and predictable behavior.
+
+⸻
+
+Resources
+
+Technical references
+	•	Linux manual pages:
+	•	man read
+	•	man open
+	•	man close
+	•	GNU C Library documentation
+	•	42 Network documentation and subject PDF
+	•	Tutorials on file descriptors and static variables in C
+
+Use of AI
+
+Artificial Intelligence was used as a learning and assistance tool for:
+	•	Clarifying the project requirements
+	•	Structuring the algorithm explanation
+
+⸻
+
+Conclusion
+
+The get_next_line project is a foundational exercise in C programming that strengthens understanding of file I/O, memory management, and algorithmic thinking.
+The implemented solution is robust, efficient, and compliant with the project requirements of the 42 curriculum.
+

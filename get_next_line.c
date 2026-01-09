@@ -5,82 +5,83 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: ancourt <ancourt@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/12/16 11:45:48 by ancourt           #+#    #+#             */
-/*   Updated: 2026/01/08 15:57:10 by ancourt          ###   ########.fr       */
+/*   Created: 2026/01/09 14:22:27 by ancourt           #+#    #+#             */
+/*   Updated: 2026/01/09 20:20:06 by ancourt          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <fcntl.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
+#include "get_next_line.h"
 
-#ifndef BUFFER_SIZE
-# define BUFFER_SIZE 100
-#endif
-
-char	*ft_newline(char *s)
+static char	*extract_line(char **tmp)
 {
-	int	c;
-	int	i;
-	
-	c = '\n';
-	i = 0;
-	while (s[i] != (unsigned char)c)
-		i++;
-		return (&s[i - i]);
-	while (s[i] != (unsigned char)c)
-		i++;
-	if ((unsigned char)c == s[i])
-		return (&s[i + 1]);
-	if ((unsigned char)c == '\0')
-		return (&s[i]);
-	else
+	char	*line;
+	char	*new_tmp;
+	char	*new_line;
+	size_t	len;
+
+	new_line = ft_strchr(*tmp, SEPARATOR);
+	len = new_line - *tmp + 1;
+	line = malloc(len + 1);
+	if (!line)
 		return (NULL);
+	line[len] = '\0';
+	while (len--)
+		line[len] = (*tmp)[len];
+	new_tmp = ft_strdup(new_line + 1);
+	if (!new_tmp)
+		return (NULL);
+	free(*tmp);
+	*tmp = new_tmp;
+	return (line);
 }
 
-char	*ft_strdup(const char *s)
+static char	*read_fusion(int fd, char *tmp)
 {
-	char	*dup;
-	size_t	i;
+	char	*buff;
+	char	*save_tmp;
+	ssize_t	read_bytes;
 
-	i = 0;
-	while (s[i])
-		i++;
-	dup = malloc(sizeof(char) * (i + 1));
-	if (!dup)
-		return (0);
-	i = 0;
-	while (s[i])
+	buff = malloc(BUFFER_SIZE + 1);
+	if (!buff)
+		return (NULL);
+	read_bytes = read(fd, buff, BUFFER_SIZE);
+	while (read_bytes > 0)
 	{
-		dup[i] = s[i];
-		i++;
+		buff[read_bytes] = '\0';
+		save_tmp = tmp;
+		tmp = ft_strjoin(save_tmp, buff);
+		free(save_tmp);
+		if (ft_strchr(tmp, SEPARATOR))
+			break ;
+		read_bytes = read(fd, buff, BUFFER_SIZE);
 	}
-	dup[i] = '\0';
-	return (dup);
+	free(buff);
+	if (read_bytes < 0)
+	{
+		free(tmp);
+		return (NULL);
+	}
+	return (tmp);
 }
 
-int	main(void)
+char	*get_next_line(int fd)
 {
-	char	buf[BUFFER_SIZE + 1];
-	int	fd;
-	int	nb_read;
-	int	count;
+	static char	*tmp;
+	char		*line;
 
-	fd = open("/home/ancourt/Documents/Projects/GNL/text.txt", O_RDONLY);
-	if (fd == -1)
-		return (1);
-	nb_read = -1;
-	count = 0;
-	while (nb_read != 0)
+	if (fd < 0 || BUFFER_SIZE <= 0)
+		return (NULL);
+	tmp = read_fusion(fd, tmp);
+	if (!tmp || !*tmp)
 	{
-		nb_read = read(fd, buf, BUFFER_SIZE);
-		if (nb_read == -1)
-			return (1);
-		buf[nb_read] = '\0';
-		printf("%s", buf);
-		count++;
+		free(tmp);
+		tmp = NULL;
+		return (NULL);
 	}
-	close(fd);
-	return (0);
+	if (ft_strchr(tmp, SEPARATOR))
+		return (extract_line(&tmp));
+	line = ft_strdup(tmp);
+	free(tmp);
+	tmp = NULL;
+	return (line);
 }
