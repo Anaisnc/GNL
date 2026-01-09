@@ -6,7 +6,7 @@
 /*   By: ancourt <ancourt@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/09 14:22:27 by ancourt           #+#    #+#             */
-/*   Updated: 2026/01/09 20:20:06 by ancourt          ###   ########.fr       */
+/*   Updated: 2026/01/09 20:20:43 by ancourt          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,7 @@ static char	*read_fusion(int fd, char *tmp)
 		buff[read_bytes] = '\0';
 		save_tmp = tmp;
 		tmp = ft_strjoin(save_tmp, buff);
+		//secu ?
 		free(save_tmp);
 		if (ft_strchr(tmp, SEPARATOR))
 			break ;
