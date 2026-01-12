@@ -3,8 +3,8 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include "get_next_line.h"
-
-int	main(int argc, char **argv)
+/*
+int	main()
 {
 int		fd;
 char	*line;
@@ -35,7 +35,7 @@ while (i < argc)
 	i++;
 }
 return (0);
-}
+}*/
 
 // int main(int ac, char **av)
 // {
@@ -62,3 +62,16 @@ return (0);
 // 	}
 // 	return (0);
 // }
+
+int	main(void)
+{
+	int fd = 0;
+	char *line;
+	fd = open("text.txt", O_RDONLY);
+	while ((line = get_next_line(fd)))
+	{
+		printf("  %s", line);
+		free(line);
+	}
+	close(fd);
+}
