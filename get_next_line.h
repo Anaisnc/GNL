@@ -6,7 +6,7 @@
 /*   By: ancourt <ancourt@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/09 17:26:54 by ancourt           #+#    #+#             */
-/*   Updated: 2026/01/09 20:50:06 by ancourt          ###   ########.fr       */
+/*   Updated: 2026/01/19 19:24:58 by ancourt          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,8 +26,8 @@
 
 char	*get_next_line(int fd);
 char	*ft_strjoin(char *s1, char *s2);
-char	*ft_strchr(char *s, int c);
-size_t	ft_strlen(char *s);
-char	*ft_strdup(char *s);
+char	*ft_strchr(const char *s, int c);
+size_t	ft_strlen(const char *s);
+char	*ft_strdup(const char *s);
 
 #endif

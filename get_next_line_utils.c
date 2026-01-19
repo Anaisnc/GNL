@@ -5,14 +5,14 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: ancourt <ancourt@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/01/09 15:15:49 by ancourt           #+#    #+#             */
-/*   Updated: 2026/01/09 20:51:56 by ancourt          ###   ########.fr       */
+/*   Created: 2026/01/19 19:21:44 by ancourt           #+#    #+#             */
+/*   Updated: 2026/01/19 19:23:14 by ancourt          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-size_t	ft_strlen(char *s)
+size_t	ft_strlen(const char *s)
 {
 	size_t	i;
 
@@ -24,33 +24,32 @@ size_t	ft_strlen(char *s)
 	return (i);
 }
 
-char	*ft_strchr(char *s, int c)
+char	*ft_strchr(const char *s, int c)
 {
-	int	i;
+	size_t	i;
 
-	i = 0;
 	if (!s)
 		return (NULL);
+	i = 0;
 	while (s[i])
 	{
 		if (s[i] == (char)c)
-			return (&s[i]);
+			return ((char *)&s[i]);
 		i++;
 	}
 	if (c == '\0')
-		return (&s[i]);
+		return ((char *)&s[i]);
 	return (NULL);
 }
 
-char	*ft_strdup(char *s)
+char	*ft_strdup(const char *s)
 {
 	char	*dup;
 	size_t	i;
 
-	i = 0;
 	if (!s)
 		return (NULL);
-	dup = malloc(ft_strlen(s) + 1);
+	dup = (char *)malloc(ft_strlen(s) + 1);
 	if (!dup)
 		return (NULL);
 	i = 0;
@@ -69,23 +68,18 @@ char	*ft_strjoin(char *s1, char *s2)
 	size_t	i;
 	size_t	j;
 
+	res = (char *)malloc(ft_strlen(s1) + ft_strlen(s2) + 1);
+	if (!res)
+		return (NULL);
 	i = 0;
 	j = 0;
-	if (!s1 && !s2)
-		return (NULL);
-	res = malloc(ft_strlen(s1) + ft_strlen(s2) + 1);
-	if (!res)
-		return (free(s2), NULL);
 	while (s1 && s1[i])
 	{
 		res[i] = s1[i];
 		i++;
 	}
 	while (s2 && s2[j])
-	{
-		res[i + j] = s2[j];
-		j++;
-	}
-	res[i + j] = '\0';
+		res[i++] = s2[j++];
+	res[i] = '\0';
 	return (res);
 }
